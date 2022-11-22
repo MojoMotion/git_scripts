@@ -1,0 +1,59 @@
+#!/bin/sh
+
+if [ -f ".gitinit" ]; then
+  rm .gitinit
+fi
+
+if [ -d ".git" ]; then
+  git add .
+  git commit -m "$1"
+  git push
+  exit
+elif [ -f ".git" ]; then
+  git add .
+  git commit -m "$1"
+  git push
+else
+  echo "You are not inside a git project directory"
+  exit 1
+fi
+
+cd ..
+PROJECT=${PWD##*/}
+PROJECT=${PROJECT:-/}
+echo "PROJECT : $PROJECT"
+
+while [ -f ".git" ]; do
+  if [ -f ".gitinit" ]; then
+    rm .gitinit
+  fi
+
+  git add .
+  if [ -z $DIR ]; then
+    git commit -m "Update of $PROJECT"
+    PROJECT="/$PROJECT"
+  else
+    git commit -m "Update of $DIR$PROJECT"
+  fi
+  git push &&
+
+  PARENT_DIR=${PWD##*/}
+  PARENT_DIR=${PARENT_DIR:-/}
+  DIR=$PARENT_DIR$DIR
+  echo $DIR$PROJECT
+  cd ..
+done
+
+PARENT_DIR=${PWD##*/}
+PARENT_DIR=${PARENT_DIR:-/}
+DIR=$PARENT_DIR/$DIR
+echo $DIR$PROJECT
+
+if [ -d ".git" ]; then
+  git add .
+  git commit -m "Update of /$DIR$PROJECT"
+  git push
+else
+  echo "ERROR : No root module found"
+  exit 1
+fi

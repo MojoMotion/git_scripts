@@ -1,0 +1,25 @@
+#!/bin/sh
+
+mkdir $1
+cd $1
+
+touch .gitinit
+git init
+git add .
+git commit -m "Initialization"
+git remote add origin git@github.com:MojoMotion/$1.git
+git push --set-upstream origin main &&
+
+cd ..
+rm -rf $1
+
+PARENT_PROJECT=${PWD##*/}
+PARENT_PROJECT=${PARENT_PROJECT:-/}
+
+if [ -n $2 ]; then
+  git submodule add git@github.com:MojoMotion/$1.git $2
+  gitpow "Adding submodule $2 ($1) to $PARENT_PROJECT"
+else
+  git submodule add git@github.com:MojoMotion/$1.git
+  gitpow "Adding submodule $1 to $PARENT_PROJECT"
+fi
