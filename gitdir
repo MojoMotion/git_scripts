@@ -8,7 +8,16 @@ git init
 git add .
 git commit -m "Initialization"
 git remote add origin git@github.com:MojoMotion/$1.git
-git push --set-upstream origin main &&
+
+if ! git push --set-upstream origin main; then
+    cd ..
+    rm -rf $1
+    echo "
+Cannot push to repository.
+Make sure the repository has already been instanciated on the distant server."
+    exit 1
+fi
+
 
 cd ..
 rm -rf $1
